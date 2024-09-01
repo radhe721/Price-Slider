@@ -1,23 +1,41 @@
-// Get references to the slider, price display, and min/max price elements
-const slider = document.getElementById('priceSlider');
-const priceValue = document.getElementById('priceValue');
-const minPrice = document.getElementById('minPrice').querySelector('h3');
-const maxPrice = document.getElementById('maxPrice').querySelector('h3');
+const rangeInput = document.querySelectorAll(".range-input input"),
+  priceInput = document.querySelectorAll(".price-input input"),
+  range = document.querySelector(".slider .progress");
+let priceGap = 1000;
 
-// Initialize the display values
-function initializeSlider() {
-    minPrice.textContent = slider.min;
-    maxPrice.textContent = slider.max;
-    priceValue.textContent = slider.value;
-}
+priceInput.forEach((input) => {
+  input.addEventListener("input", (e) => {
+    let minPrice = parseInt(priceInput[0].value),
+      maxPrice = parseInt(priceInput[1].value);
 
-// Function to update the display value
-function updatePrice() {
-    priceValue.textContent = slider.value;
-}
+    if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
+      if (e.target.className === "input-min") {
+        rangeInput[0].value = minPrice;
+        range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
+      } else {
+        rangeInput[1].value = maxPrice;
+        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+      }
+    }
+  });
+});
 
-// Initialize the display when the page loads
-initializeSlider();
+rangeInput.forEach((input) => {
+  input.addEventListener("input", (e) => {
+    let minVal = parseInt(rangeInput[0].value),
+      maxVal = parseInt(rangeInput[1].value);
 
-// Add an event listener to update the display when the slider value changes
-slider.addEventListener('input', updatePrice);
+    if (maxVal - minVal < priceGap) {
+      if (e.target.className === "range-min") {
+        rangeInput[0].value = maxVal - priceGap;
+      } else {
+        rangeInput[1].value = minVal + priceGap;
+      }
+    } else {
+      priceInput[0].value = minVal;
+      priceInput[1].value = maxVal;
+      range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
+      range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
+    }
+  });
+});
